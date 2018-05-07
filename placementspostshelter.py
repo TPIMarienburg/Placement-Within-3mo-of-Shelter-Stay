@@ -75,7 +75,7 @@ class IdentifyPlacementsPostShelterStay:
         merged["Entry Exit Entry Date"] = merged["Entry Exit Entry Date"].dt.date
         merged["Entry Exit Exit Date"] = merged["Entry Exit Exit Date"].dt.date
         merged["Placement Date(3072)"] = merged["Placement Date(3072)"].dt.date
-        merged["3mo Pre Placement"] = merged["Placement Date(3072)"] + relativedelta(month=-3)
+        merged["3mo Pre Placement"] = merged["Placement Date(3072)"] + relativedelta(months=-3)
         in_range = merged[
             (
                 (merged["Entry Exit Exit Date"] < merged["Placement Date(3072)"]) |
