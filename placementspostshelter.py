@@ -125,7 +125,7 @@ class IdentifyPlacementsPostShelterStay:
             entry_data,
             placement_data
         )
-        return find_closest_address(post_shelter_placement)
+        return self.find_closest_address(post_shelter_placement)
 
 if __name__ == "__main__":
     # report location: \\tproserver\Reports\OneOff\DavidKatz\FY17-18\Placements Post Shelter Stay
@@ -142,3 +142,5 @@ if __name__ == "__main__":
         ),
         engine="xlsxwriter"
     )
+    report.to_excel(writer, sheet_name="Address List", index=False)
+    writer.save()
