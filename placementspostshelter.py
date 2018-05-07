@@ -40,9 +40,9 @@ class IdentifyPlacementsPostShelterStay:
 
     def find_related_data(
         self,
-        entries=self.entries,
-        placements=self.placements,
-        adresses=self.addresses
+        entries=raw_entries,
+        placements=raw_placements,
+        adresses=raw_addresses
     ):
         """
         Compare the entries dataframe and the placement dataframe. Return a placement dataframe with
@@ -116,7 +116,11 @@ class IdentifyPlacementsPostShelterStay:
         Sequence: find_related_data, check_for_entry_3_months_prior_to_placement,
         find_closest_address
         """
-        entry_data, placement_data, address_data = self.find_related_data()
+        entry_data, placement_data, address_data = self.find_related_data(
+            self.raw_entries,
+            self.raw_placements,
+            self.raw_addresses
+        )
         post_shelter_placement = self.check_for_entry_3_months_prior_to_placement(
             entry_data,
             placement_data
