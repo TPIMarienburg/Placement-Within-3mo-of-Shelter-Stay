@@ -25,24 +25,24 @@ class IdentifyPlacementsPostShelterStay:
         self.raw_entries = pd.read_excel(self.file, sheet_name="Entries to Shelter").dropna(
             axis=0,
             how="any",
-            subset="Entry Exit Exit Date"
+            subset=["Entry Exit Exit Date"]
         )
         self.raw_placements = pd.read_excel(self.file, sheet_name="Placement Data").dropna(
             axis=0,
             how="any",
-            subset="Placement Date(3072)"
+            subset=["Placement Date(3072)"]
         )
         self.raw_addresses = pd.read_excel(self.file, sheet_name="Address Data").dropna(
             axis=0,
             how="any",
-            subset="Placement Date(833)"
+            subset=["Placement Date(833)"]
         )
 
     def find_related_data(
         self,
         entries,
         placements,
-        adresses
+        addresses
     ):
         """
         Compare the entries dataframe and the placement dataframe. Return a placement dataframe with
