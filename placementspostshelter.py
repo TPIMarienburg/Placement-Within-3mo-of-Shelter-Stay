@@ -88,6 +88,33 @@ class IdentifyPlacementsPostShelterStay:
         ]
         return in_range
 
+    def check_for_placement_3_months_prior_to_shelter_entry(self, entry_data, placement_data):
+        """
+        Compare shelter entry dates and placement dates looking for an placement date that is
+        no more than 3 months prior to the entry exit entry date.  Return the resulting dataframe.
+
+        :entry_data: An entry dataframe processed to only contain rows with a Client Uid in the
+        placement dataframe
+        :placement_data: A placement dataframe processed to only contain rows with a Client Uid in
+        the entries dataframe
+        """
+        merged = pd.merge(placement_data, entry_data, how="outer", on="Client Uid")
+        merged["Entry Exit Entry Date"] = merged["Entry Exit Entry Date"].dt.date
+        merged["Entry Exit Exit Date"] = merged["Entry Exit Exit Date"].dt.date
+        merged["Placement Date(3072)"] = merged["Placement Date(3072)"].dt.date
+        merged["3mo Post Placement"] = merged["Placement Date(3072)"] + relativedelta(months=+3)
+        in_range = merged[
+            (
+                (merged["Placement Date(3072)"] < merged["Entry Exit Entry Date"]) |
+                (merged["Placement Date(3072)"] == merged["Entry Exit Entry Date"])
+            ) &
+            (
+                (merged["3mo Post Placement"] > merged["Entry Exit Entry Date"]) |
+                (merged["3mo Post Placement"] == merged["Entry Exit Entry Date"])
+            )
+        ]
+        return in_range
+
     def find_closest_address(self, placement_data):
         """
         Compare the addresses dataframe to the placements dataframe returned by the
@@ -110,7 +137,7 @@ class IdentifyPlacementsPostShelterStay:
             )
         ]
 
-    def process(self):
+    def process_for_placement_post_shelter_stay(self):
         """
         Call the other methods in this class in sequence and return the resulting dataframe.
         Sequence: find_related_data, check_for_entry_3_months_prior_to_placement,
@@ -127,13 +154,30 @@ class IdentifyPlacementsPostShelterStay:
         )
         return self.find_closest_address(post_shelter_placement)
 
+    def process_for_shelter_stay_post_placement(self):
+        """
+        Call the other methods in this class in sequence and return the resulting dataframe.
+        Sequence: find_related_data, check_for_entry_3_months_prior_to_placement,
+        find_closest_address
+        """
+        entry_data, placement_data, address_data = self.find_related_data(
+            self.raw_entries,
+            self.raw_placements,
+            self.raw_addresses
+        )
+        post_shelter_placement = self.check_for_placement_3_months_prior_to_shelter_entry(
+            entry_data,
+            placement_data
+        )
+        return self.find_closest_address(post_shelter_placement)
+
 if __name__ == "__main__":
     # report location: \\tproserver\Reports\OneOff\DavidKatz\FY17-18\Placements Post Shelter Stay
     report = askopenfilename(
         title="Open the Placement Report v.4 + Entry to Shelter.xlsx ART report"
     )
     run = IdentifyPlacementsPostShelterStay(report)
-    report = run.process()
+    report = run.process_for_shelter_stay_post_placement()
     writer = pd.ExcelWriter(
         asksaveasfilename(
             title="Save the Shelter Related Placement Report",
