@@ -40,9 +40,9 @@ class IdentifyPlacementsPostShelterStay:
 
     def find_related_data(
         self,
-        entries=raw_entries,
-        placements=raw_placements,
-        adresses=raw_addresses
+        entries,
+        placements,
+        adresses
     ):
         """
         Compare the entries dataframe and the placement dataframe. Return a placement dataframe with
